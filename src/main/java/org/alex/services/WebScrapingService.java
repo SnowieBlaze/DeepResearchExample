@@ -12,7 +12,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WebScrapingService {
+public class WebScrapingService implements AutoCloseable {
 
     private final WebDriver webDriver;
     private final HTMLCleaningService htmlCleaningService;

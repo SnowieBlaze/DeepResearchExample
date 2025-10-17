@@ -20,6 +20,7 @@ public class ResearchAgent extends BaseAgent {
             Your task is to synthesize this information into a single comprehensive, well-structured, factual report.
             
             Do not list summaries. Weave their information together, and form a coherent narrative. The report should have an introduction, key themes supported by facts from the summaries and also a concluding paragraph.
+            I want you to clearly separate the introduction, the content(in which you will clearly separate key points/paragraphs), the conclusion.
             
             Original Topic: '{topic}'
             

@@ -2,8 +2,9 @@ package org.alex.agents;
 
 import dev.langchain4j.model.openai.OpenAiChatModelName;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SearchAgent extends BaseAgent{
     //Again, hard-coded values should go into a config file
@@ -12,11 +13,11 @@ public class SearchAgent extends BaseAgent{
         
         Topic: '{topic}'
         
-        Return ONLY a new line-separated list of the search queries and nothing else.
-        Example: 
-         query one
-         another query
-         a third query
+        Return ONLY a comma-separated list of the search queries.
+        DO NOT include numbers, bullet points, or quotation marks in your output.
+        
+        Example of correct output:
+        query one, another query, a third query
         """;
 
 
@@ -34,8 +35,11 @@ public class SearchAgent extends BaseAgent{
     public List<String> generateSearches(Integer number, String topic){
         String prompt = PROMPT.replace("{number}", number.toString()).replace("{topic}", topic);
         String response = model.chat(prompt);
-        String[] lines = response.split("\n");
 
-        return new ArrayList<>(List.of(lines));
+        return Arrays.stream(response.split(","))
+                .map(String::trim)
+                .map(query -> query.replaceAll("^[0-9]+\\.\\s*\"", "").replaceAll("\"$", ""))
+                .filter(query -> !query.isEmpty())
+                .collect(Collectors.toList());
     }
 }
