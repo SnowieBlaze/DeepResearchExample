@@ -24,14 +24,19 @@ The research agent workflow is as follows:
 - First, clone the repository.
   `git clone https://github.com/SnowieBlaze/DeepResearchExample`
 - Next, create a .env file where you hold the following:
+  ```
+    OPENAI_API_KEY=your open ai key
+    GOOGLE_SEARCH_API_KEY=your google search api key
+    CX_ID=your programmable search engine id
   
+  Below values can be customized, defaults are used here
+    CACHE_FILE_PATH=search_results.txt 
+    RESEARCH_TOPIC="How to build a deep research agent"
+    LLM_QUERY_AMOUNT="3"
+    RESULTS_PER_QUERY="3"
+    CRAWL_DEPTH="2"
+    MAX_CRAWL_URLS_PER_PAGE="3"
   ```
-  your openai api key
-  your google api key
-  your programmable search engine id(from google)
-  a cache file path
-  ```
-- Within `AppConfig`(org/config/AppConfig) you can modify parameters such as research topic, crawl depth, llm queries generated. I recommend not increasing the numbers too much since the crawling will end up taking a very long time, and you will also be going to a depth where little websites are still relevant.
 - Build the project using gradle.
   ```
   Windows: .\gradlew build
@@ -45,7 +50,8 @@ The research agent workflow is as follows:
   
 
 ## Tips
-- New Research Topics: To research a new topic, simply delete the search_results.txt file from the project root and update the researchTopic in AppConfig.java. This will trigger a new live search.
-- Manual URL Input: You can bypass the Google Search step entirely by manually pasting your own list of URLs (one per line) into the search_results.txt file. The agent will use these on its next run.
+- New Research Topics: To research a new topic, simply delete the search_results.txt file from the project root and update the environment variable. This will trigger a new live search.
+- Manual URL Input: You can bypass the Google Search step entirely by manually pasting your own list of URLs (one per line) into the cache file(default: search_results.txt). The agent will use these on its next run.
 - Output Location: The final report will be saved as a .txt project root, named according to the research topic (e.g., Report-How_to_build_a_deep_research_agent.txt).
 - Sample Report: A sample generated report for the topic "How to build a deep research agent" is included in the project root for reference
+- Note: Running a research topic will take around 5 minutes on default settings.
