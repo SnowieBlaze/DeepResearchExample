@@ -15,13 +15,25 @@ public class ReportGenerator {
      * @param config - application config
      */
     public void saveAsTextFile(String reportContent, AppConfig config) {
-        String fileName = "Report-" + config.researchTopic().replaceAll("[^a-zA-Z0-9]", "_") + ".txt";
-
         try {
-            Path filePath = Paths.get(fileName);
-            Files.writeString(filePath, reportContent, StandardCharsets.UTF_8);
+            String filename = "Report-" + config.researchTopic().replaceAll("[^a-zA-Z0-9]", "_");
+            String extension = ".txt";
+
+            Path finalFilePath = Paths.get(filename + extension);
+            int counter = 1;
+            while (Files.exists(finalFilePath)) {
+                String newFileName = filename + "_" + counter + extension;
+                finalFilePath = Paths.get(newFileName);
+                counter++;
+            }
+
+            String fileHeader = "Research topic: " + config.researchTopic() + " \n";
+            String fullContentToWrite = fileHeader + reportContent;
+
+            Files.writeString(finalFilePath, fullContentToWrite, StandardCharsets.UTF_8);
+
         } catch (IOException e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println("Error when saving report: " + e.getMessage());
         }
     }
 }

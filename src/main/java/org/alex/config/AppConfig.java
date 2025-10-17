@@ -24,7 +24,7 @@ public record AppConfig(
                 3,
                 3,
                 dotenv.get("CACHE_FILE_PATH"),
-                1,
+                2,
                 3
         );
     }
