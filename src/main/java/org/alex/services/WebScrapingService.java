@@ -1,32 +1,40 @@
 package org.alex.services;
 
 import org.alex.records.ScrapeRecord;
-import org.openqa.selenium.By;
+import org.jsoup.nodes.Document;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.FluentWait;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class WebScrapingService {
 
     private final WebDriver webDriver;
+    private final HTMLCleaningService htmlCleaningService;
 
-    public WebScrapingService() {
+    public WebScrapingService(HTMLCleaningService htmlCleaningService) {
 
         ChromeOptions options = new ChromeOptions();
+        String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36";
+        options.addArguments("--user-agent=" + userAgent);
+
+        // Needed to not be detected as bot immediately
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.setExperimentalOption("excludeSwitches", List.of("enable-automation"));
+        options.setExperimentalOption("useAutomationExtension", false);
+
         options.addArguments("--headless");
         options.addArguments("--disable-gpu");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
 
         this.webDriver = new ChromeDriver(options);
+        this.htmlCleaningService = htmlCleaningService;
     }
 
     /**
@@ -39,19 +47,26 @@ public class WebScrapingService {
     public ScrapeRecord scrape(String url){
         try {
             webDriver.get(url);
-            WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(2L));
-            WebElement bodyElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("body")));
+            new FluentWait<>(webDriver)
+                    .withTimeout(Duration.ofSeconds(5))
+                    .pollingEvery(Duration.ofMillis(500))
+                    .ignoring(Exception.class)
+                    .until(webDriver -> ((JavascriptExecutor) webDriver)
+                            .executeScript("return document.readyState").equals("complete"));
 
-            List<WebElement> linkElems = webDriver.findElements(By.tagName("a"));
-            List<String> links = linkElems.stream()
-                    .map(e -> e.getAttribute("href"))
-                    .filter(e -> e != null && (e.startsWith("http") || e.startsWith("https")))
+            Document cleanedDoc = htmlCleaningService.clean(webDriver.getPageSource());
+            String content = cleanedDoc.text();
+
+            List<String> links = cleanedDoc.select("a").stream()
+                    .map(e -> e.attr("abs:href"))
+                    .filter(e -> !e.isEmpty())
                     .distinct()
                     .toList();
 
-            return new ScrapeRecord(url, bodyElement.getText(), links);
+            return new ScrapeRecord(url, content, links);
 
         } catch (Exception e) {
+            System.out.println("--> SCRAPE FAILED for URL: " + url + " | Reason: " + e.getClass().getSimpleName() + " - " + e.getMessage());
             return new ScrapeRecord(url, "", new ArrayList<>());
         }
     }

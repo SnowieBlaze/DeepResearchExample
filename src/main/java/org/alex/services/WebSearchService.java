@@ -13,11 +13,13 @@ import java.util.List;
 
 public class WebSearchService {
 
-    private static final String API_KEY = System.getenv("GOOGLE_SEARCH_API_KEY");
-    private static final String CX_ID = System.getenv("CX_ID");
+    private final String apiKey;
+    private final String cxId;
     private final CustomSearchAPI customsearch;
 
-    public WebSearchService() {
+    public WebSearchService(String apiKey, String cxId) {
+        this.apiKey = apiKey;
+        this.cxId = cxId;
         this.customsearch = new CustomSearchAPI.Builder(new NetHttpTransport(), new GsonFactory(), null).setApplicationName("Deep research").build();
     }
 
@@ -32,8 +34,8 @@ public class WebSearchService {
         try {
             CustomSearchAPI.Cse.List request = customsearch.cse().list();
 
-            request.setKey(API_KEY);
-            request.setCx(CX_ID);
+            request.setKey(apiKey);
+            request.setCx(cxId);
             request.setQ(query);
             request.setNum(limit);
 
