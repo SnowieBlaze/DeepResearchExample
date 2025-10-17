@@ -16,12 +16,33 @@ The research agent workflow is as follows:
 - The crawled results are then put into 2 buckets: relevant or irrelevant using the relevancy agent
 - Finally, each of the relevant results is summarised, and then all of these summaries are used to assemble a report.
 
+## Requirements:
+- Java 21+
+- Google Chrome (the web scraper uses chrome as a driver)
+
 ## Setup and Usage
 - First, clone the repository.
-- Next, create a .env file where you hold the following: your openai api key, your google api key, your programmable search engine id and a cache file path.
-- Within AppConfig(org/config/AppConfig) you can modify parameters such as research topic, crawl depth, llm queries generated. I recommend not increasing the numbers too much since the crawling will end up taking a very long time.
-- Build the project using gradle.(.\gradlew build)
-- Finally, run the project, either from your IDE using Main.java, or using Gradle.(.\gradlew run)
+  `git clone https://github.com/SnowieBlaze/DeepResearchExample`
+- Next, create a .env file where you hold the following:
+  
+  ```
+  your openai api key
+  your google api key
+  your programmable search engine id(from google)
+  a cache file path
+  ```
+- Within `AppConfig`(org/config/AppConfig) you can modify parameters such as research topic, crawl depth, llm queries generated. I recommend not increasing the numbers too much since the crawling will end up taking a very long time, and you will also be going to a depth where little websites are still relevant.
+- Build the project using gradle.
+  ```
+  Windows: .\gradlew build
+  Linux: ./gradlew build
+  ```
+- Finally, run the project, either from your IDE using Main.java, or using Gradle.
+  ```
+  Windows: .\gradlew run
+  Linux: ./gradlew run
+  ```
+  
 
 ## Tips
 - New Research Topics: To research a new topic, simply delete the search_results.txt file from the project root and update the researchTopic in AppConfig.java. This will trigger a new live search.
